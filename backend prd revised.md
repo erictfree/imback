@@ -158,7 +158,17 @@ Returns all non-expired pins for map visualization.
 
 ---
 
-### 6.4 `GET /v1/alive` — Health Check
+### 6.4 `DELETE /v1/pin/:deviceId` — Delete Pin
+
+Removes a pin by device ID.
+
+**Responses:**
+- `200` — `{ "success": true }`
+- `404` — `{ "error": "Pin not found" }`
+
+---
+
+### 6.5 `GET /v1/alive` — Health Check
 
 **Response:**
 ```json
@@ -214,15 +224,13 @@ Returns all non-expired pins for map visualization.
 
 ## 10. Logging
 
-**Level:** Minimal
-
-- Log errors with stack traces
+- Log all endpoint hits with method, path, status, and duration
+- Log pin data on POST (`PIN UPDATED: deviceId | playlist | coords | timestamp`)
+- Log GET/DELETE results per handler
+- Log memory status every 60 seconds (`[STATUS] pin count | playlist count | breakdown`)
 - Log startup info (port, config values)
 - Log warning when pin count exceeds threshold
-
-**Not logged:**
-- Individual requests
-- Request/response bodies
+- Log errors with stack traces
 
 ---
 
@@ -247,6 +255,8 @@ Returns all non-expired pins for map visualization.
 - [ ] Expired pins are purged periodically (every 5 min)
 - [ ] Global rate limiting returns 429 when exceeded
 - [ ] Warning logged when pin count exceeds threshold
+- [ ] `DELETE /v1/pin/:deviceId` removes pin and returns 200
+- [ ] `DELETE /v1/pin/:deviceId` returns 404 if not found
 - [ ] `GET /v1/alive` responds with health info
 - [ ] Service restart clears all pins
 - [ ] No city/region logic exists in backend
