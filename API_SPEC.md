@@ -115,6 +115,32 @@ Returns the full payload that was stored (the original POST body):
 
 ---
 
+### `DELETE /v1/pin/:deviceId`
+
+Delete a pin by device ID.
+
+**Path Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `deviceId` | `string` | The device identifier |
+
+**Response:** `200 OK`
+
+```json
+{
+  "success": true
+}
+```
+
+**Errors:**
+
+| Status | Response | Description |
+|--------|----------|-------------|
+| 404 | `{ "error": "Pin not found" }` | Pin not found |
+
+---
+
 ### `GET /v1/pins`
 
 Retrieve all non-expired pins for map display.

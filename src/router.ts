@@ -3,6 +3,7 @@ import { handlePostPin } from './handlers/postPin.js';
 import { handleGetPin } from './handlers/getPin.js';
 import { handleGetPins } from './handlers/getPins.js';
 import { handleAlive } from './handlers/alive.js';
+import { handleDeletePin } from './handlers/deletePin.js';
 import { sendNotFound } from './utils/response.js';
 
 interface RouteParams {
@@ -36,6 +37,12 @@ const routes: Route[] = [
     pattern: /^\/v1\/pins$/,
     handler: handleGetPins,
     paramNames: [],
+  },
+  {
+    method: 'DELETE',
+    pattern: /^\/v1\/pin\/([^/]+)$/,
+    handler: handleDeletePin,
+    paramNames: ['deviceId'],
   },
   {
     method: 'GET',
