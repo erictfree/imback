@@ -4,6 +4,7 @@ import { route } from './router.js';
 import { isRateLimited } from './middleware/rateLimit.js';
 import { sendRateLimited, sendInternalError } from './utils/response.js';
 import { startPurgeInterval, startStatusInterval } from './store/pinStore.js';
+import { startRadioPurgeInterval } from './store/radioStore.js';
 import { startSeedData } from './seed.js';
 
 async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
@@ -42,6 +43,7 @@ const server = createServer((req, res) => {
 // Start periodic tasks
 startPurgeInterval();
 startStatusInterval();
+startRadioPurgeInterval();
 startSeedData();
 
 server.listen(config.port, () => {

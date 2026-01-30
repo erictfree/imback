@@ -177,6 +177,68 @@ Retrieve all non-expired pins for map display.
 
 ---
 
+### `POST /v1/radio`
+
+Register a radio listener heartbeat. Call this periodically (recommended: every 30–60 seconds) to indicate the device is actively listening. Listeners that don't heartbeat for 5 minutes are automatically removed.
+
+**Request Headers:**
+```
+Content-Type: application/json
+```
+
+**Request Body:**
+
+```json
+{
+  "id": "8A3F2B1C-4D5E-6F7A-8B9C-0D1E2F3A4B5C"
+}
+```
+
+| Field | Type | Required | Validation |
+|-------|------|----------|------------|
+| `id` | `string` | Yes | Non-empty (e.g. device advertising identifier) |
+
+**Response:** `200 OK`
+
+```json
+{
+  "ok": true,
+  "count": 7
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ok` | `boolean` | Always `true` |
+| `count` | `integer` | Current number of active listeners |
+
+**Errors:**
+
+| Status | Code | Example |
+|--------|------|---------|
+| 400 | `VALIDATION_ERROR` | `"id is required and must be a non-empty string"` |
+| 429 | `RATE_LIMITED` | `"Too many requests"` |
+
+---
+
+### `GET /v1/radio`
+
+Get the current number of active radio listeners.
+
+**Response:** `200 OK`
+
+```json
+{
+  "count": 7
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `count` | `integer` | Number of unique IDs that have heartbeated within the last 5 minutes |
+
+---
+
 ## Data Types
 
 ### PinRecord (Internal)
@@ -258,6 +320,14 @@ Environment variables:
 - If a pin exists for the device, it is replaced
 - Only the latest pin per device is stored
 
+### Radio Listeners
+
+- Tracked in a separate in-memory store (`Map<id, lastSeenTimestamp>`)
+- Each `POST /v1/radio` upserts the ID with the current time
+- IDs not updated within 5 minutes are purged (background task every 1 minute)
+- `GET /v1/radio` returns the count of currently active (non-expired) IDs
+- Client should heartbeat every 30–60 seconds to stay counted
+
 ### Rate Limiting
 
 - Global rate limit (all requests combined)
@@ -297,6 +367,20 @@ curl http://localhost:3000/v1/pins
 
 ```bash
 curl http://localhost:3000/v1/pin/ABC-123
+```
+
+### Radio Heartbeat
+
+```bash
+curl -X POST http://localhost:3000/v1/radio \
+  -H "Content-Type: application/json" \
+  -d '{ "id": "ABC-123" }'
+```
+
+### Get Radio Listener Count
+
+```bash
+curl http://localhost:3000/v1/radio
 ```
 
 ### Health Check

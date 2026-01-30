@@ -168,7 +168,55 @@ Removes a pin by device ID.
 
 ---
 
-### 6.5 `GET /v1/alive` — Health Check
+### 6.5 `POST /v1/radio` — Radio Heartbeat
+
+Registers a listener by unique ad ID. The server tracks active listeners and automatically removes any that haven't sent a heartbeat within 5 minutes.
+
+**Request Body:**
+```json
+{
+  "id": "8A3F2B1C-4D5E-6F7A-8B9C-0D1E2F3A4B5C"
+}
+```
+
+**Validation:**
+
+| Field | Rule |
+|-------|------|
+| `id` | Required, non-empty string |
+
+**Behavior:**
+- Upsert by `id` — each heartbeat resets that ID's 5-minute expiration timer
+- IDs with no heartbeat for 5 minutes are automatically removed
+
+**Response:**
+```json
+{ "ok": true, "count": 7 }
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ok` | `boolean` | Always `true` |
+| `count` | `integer` | Current number of active listeners |
+
+---
+
+### 6.6 `GET /v1/radio` — Get Radio Listener Count
+
+Returns the current number of active radio listeners.
+
+**Response:**
+```json
+{ "count": 7 }
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `count` | `integer` | Number of unique IDs that have heartbeated within the last 5 minutes |
+
+---
+
+### 6.7 `GET /v1/alive` — Health Check
 
 **Response:**
 ```json
@@ -257,6 +305,9 @@ Removes a pin by device ID.
 - [ ] Warning logged when pin count exceeds threshold
 - [ ] `DELETE /v1/pin/:deviceId` removes pin and returns 200
 - [ ] `DELETE /v1/pin/:deviceId` returns 404 if not found
+- [ ] `POST /v1/radio` registers listener and returns count
+- [ ] `GET /v1/radio` returns active listener count
+- [ ] Radio listeners expire after 5 minutes of no heartbeat
 - [ ] `GET /v1/alive` responds with health info
 - [ ] Service restart clears all pins
 - [ ] No city/region logic exists in backend
